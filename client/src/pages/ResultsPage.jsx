@@ -13,7 +13,7 @@ const ResultsPage = () => {
     useEffect(() => {
         const fetchResponse = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/responses/single/${responseId}`);
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/responses/single/${responseId}`);
                 setResponse(res.data);
             } catch (error) {
                 console.error("Failed to fetch result", error);

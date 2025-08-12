@@ -34,7 +34,7 @@ const FormEditor = () => {
     } else {
       const fetchForm = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/forms/${formId}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
           setForm(response.data);
           setCurrentTitle(response.data.title);
         } catch (err) {
@@ -55,13 +55,13 @@ const FormEditor = () => {
     try {
       if (isNewForm) {
         if (!user) throw new Error("User not found");
-        const formResponse = await axios.post('http://localhost:5000/api/forms', {
+        const formResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
           title: currentTitle,
           userId: user.id
         });
         navigate(`/editor/${formResponse.data._id}`, { replace: true });
       } else {
-        const response = await axios.put(`http://localhost:5000/api/forms/${formId}`, { title: currentTitle });
+        const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`, { title: currentTitle });
         setForm(response.data);
         setCurrentTitle(response.data.title);
       }
@@ -80,15 +80,15 @@ const FormEditor = () => {
       let currentFormId = formId;
       if (isNewForm) {
         if (!user) throw new Error("User not found");
-        const formResponse = await axios.post('http://localhost:5000/api/forms', {
+        const formResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
           title: currentTitle,
           userId: user.id
         });
         currentFormId = formResponse.data._id;
         navigate(`/editor/${currentFormId}`, { replace: true });
       } else {
-        await axios.post(`http://localhost:5000/api/forms/${formId}/questions`, questionData);
-        const updatedForm = await axios.get(`http://localhost:5000/api/forms/${formId}`);
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}/questions`, questionData);
+        const updatedForm = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
         setForm(updatedForm.data);
         setActiveBuilder(null);
       }
@@ -103,7 +103,7 @@ const FormEditor = () => {
     if (!file || isNewForm) return;
 
     try {
-      const authResponse = await axios.get('http://localhost:5000/api/imagekit/auth');
+      const authResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/imagekit/auth`);
       const formData = new FormData();
       formData.append('file', file);
       formData.append('fileName', file.name);
@@ -115,7 +115,7 @@ const FormEditor = () => {
       const uploadResponse = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formData);
       const imageUrl = uploadResponse.data.url;
 
-      const updateResponse = await axios.put(`http://localhost:5000/api/forms/${formId}`, { headerImage: imageUrl });
+      const updateResponse = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`, { headerImage: imageUrl });
       
       setForm(updateResponse.data);
     } catch (err) {
@@ -144,7 +144,7 @@ const FormEditor = () => {
 
       if (window.confirm(`Are you sure you want to delete "${form.title}"? This is permanent.`)) {
           try {
-              await axios.delete(`http://localhost:5000/api/forms/${formId}`);
+              await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
               alert('Form deleted successfully.');
               navigate('/dashboard'); // Redirect to dashboard after deletion
           } catch (error) {

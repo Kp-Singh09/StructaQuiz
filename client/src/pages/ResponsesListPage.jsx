@@ -14,7 +14,7 @@ const ResponsesListPage = () => {
     if (user) {
       const fetchUserForms = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/forms/user/${user.id}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/user/${user.id}`);
           setForms(response.data);
         } catch (error) {
           console.error("Failed to fetch user forms", error);

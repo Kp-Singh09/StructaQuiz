@@ -14,7 +14,7 @@ const SubmissionsPage = () => {
     if (user) {
       const fetchSubmissions = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/responses/user/${user.id}`);
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/responses/user/${user.id}`);
           setSubmissions(response.data);
         } catch (error) {
           console.error("Failed to fetch user submissions", error);

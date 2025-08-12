@@ -14,8 +14,8 @@ const ResponseViewerPage = () => {
     const fetchData = async () => {
       try {
         // Fetch both form details and responses for that form
-        const formRes = await axios.get(`http://localhost:5000/api/forms/${formId}`);
-        const responsesRes = await axios.get(`http://localhost:5000/api/responses/${formId}`);
+        const formRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
+        const responsesRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/responses/${formId}`);
         
         setForm(formRes.data);
         setResponses(responsesRes.data);

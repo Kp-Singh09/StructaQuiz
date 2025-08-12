@@ -26,8 +26,8 @@ const StatsPage = () => {
             const fetchStats = async () => {
                 try {
                     const [statsRes, leaderboardRes] = await Promise.all([
-                        axios.get(`http://localhost:5000/api/stats/user/${user.id}`),
-                        axios.get(`http://localhost:5000/api/stats/leaderboard`)
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/stats/user/${user.id}`),
+                        axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/stats/leaderboard`)
                     ]);
                     setUserStats(statsRes.data);
                     setLeaderboard(leaderboardRes.data);

@@ -19,7 +19,7 @@ const FormRenderer = () => {
   useEffect(() => {
     const fetchForm = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/forms/${formId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
         setForm(response.data);
       } catch (err) {
         setError('Failed to fetch form. Please check the URL.');
@@ -41,7 +41,7 @@ const FormRenderer = () => {
     }
     try {
       // Capture the response from the backend
-      const response = await axios.post('http://localhost:5000/api/responses', {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/responses`, {
         formId,
         answers: Object.entries(answers).map(([questionId, answer]) => ({ questionId, answer })),
         userId: user.id,

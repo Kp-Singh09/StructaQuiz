@@ -16,7 +16,8 @@ const DashboardPage = () => {
     if (user) {
       const fetchUserForms = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/forms/user/${user.id}`);
+          // --- FIX 1: Correctly access the environment variable ---
+          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/user/${user.id}`);
           setForms(response.data);
         } catch (error) {
           console.error("Failed to fetch user forms", error);
@@ -43,15 +44,14 @@ const DashboardPage = () => {
     });
   };
 
-  // --- NEW DELETE HANDLER ---
   const handleDelete = async (formId, formTitle, event) => {
     event.preventDefault();
     event.stopPropagation();
 
     if (window.confirm(`Are you sure you want to delete "${formTitle}"? This action cannot be undone.`)) {
       try {
-        await axios.delete(`http://localhost:5000/api/forms/${formId}`);
-        // Update state to remove the form from the UI instantly
+        // --- FIX 2: Correctly access the environment variable here too ---
+        await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
         setForms(forms.filter(form => form._id !== formId));
       } catch (error) {
         console.error("Failed to delete form", error);
@@ -86,11 +86,11 @@ const DashboardPage = () => {
             {forms.length > 0 ? (
                 forms.map((form, index) => (
                     <div key={form._id} className="flex flex-col">
+                        {/* --- FIX 3: Links should be internal routes, not full URLs --- */}
                         <Link to={`/editor/${form._id}`} className="block bg-slate-800/50 rounded-t-2xl p-6 flex-grow hover:bg-slate-800 transition-colors">
                             <h3 className="text-xl font-semibold mb-2 truncate">{form.title}</h3>
                             <p className="text-gray-400 text-sm">{form.responses.length} response(s)</p>
                         </Link>
-                        {/* --- UPDATED BUTTON CONTAINER --- */}
                         <div className="bg-slate-800/50 rounded-b-2xl p-4 flex gap-2 border-t border-slate-700">
                             <button 
                               onClick={(e) => handleShare(form._id, e)}
@@ -107,7 +107,6 @@ const DashboardPage = () => {
                                   Edit
                                 </button>
                             </Link>
-                            {/* --- NEW DELETE BUTTON --- */}
                             <button 
                               onClick={(e) => handleDelete(form._id, form.title, e)}
                               className="p-2 px-3 bg-red-500/20 text-red-300 rounded-lg text-sm font-semibold hover:bg-red-600 hover:text-white transition-colors"
