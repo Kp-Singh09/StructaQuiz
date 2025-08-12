@@ -7,20 +7,24 @@ import responseRoutes from './routes/responseRoutes.js';
 import imageKitRoutes from './routes/imageKitRoutes.js'; 
 import statsRoutes from './routes/statsRoutes.js';
 
-// Initialize App
 dotenv.config();
 const app = express();
 
-// --- THIS IS THE CORRECTED SECTION ---
-// Middleware
+// CORS configuration
+const allowedOrigin = process.env.FRONTEND_URL || "https://structa-quiz.vercel.app";
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL
-    ? [process.env.FRONTEND_URL, `${process.env.FRONTEND_URL}/`]
-    : '*', // Fallback for safety, can be removed if FRONTEND_URL is always set
-  optionsSuccessStatus: 200 
+  origin: allowedOrigin,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
-// ------------------------------------
+
+// Explicitly handle preflight OPTIONS requests
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -29,7 +33,6 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.get('/', (req, res) => {
   res.send('Form Builder API is running!');
 });
-
 
 // API Routes
 app.use('/api/forms', formRoutes);
