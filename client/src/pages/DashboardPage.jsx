@@ -1,4 +1,4 @@
-// src/pages/DashboardPage.jsx
+// client/src/pages/DashboardPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -29,11 +29,11 @@ const DashboardPage = () => {
   }, [user]);
 
   const handleCreateForm = () => {
-    navigate('/editor/new'); 
+    navigate('/editor/new');
   };
 
   const handleShare = (formId, event) => {
-    event.preventDefault(); 
+    event.preventDefault();
     event.stopPropagation();
     
     const shareLink = `${window.location.origin}/form/${formId}`;
@@ -41,6 +41,23 @@ const DashboardPage = () => {
       setCopiedFormId(formId);
       setTimeout(() => setCopiedFormId(null), 2000);
     });
+  };
+
+  // --- NEW DELETE HANDLER ---
+  const handleDelete = async (formId, formTitle, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (window.confirm(`Are you sure you want to delete "${formTitle}"? This action cannot be undone.`)) {
+      try {
+        await axios.delete(`http://localhost:5000/api/forms/${formId}`);
+        // Update state to remove the form from the UI instantly
+        setForms(forms.filter(form => form._id !== formId));
+      } catch (error) {
+        console.error("Failed to delete form", error);
+        alert("Could not delete the form. Please try again.");
+      }
+    }
   };
 
   if (loading) {
@@ -68,36 +85,38 @@ const DashboardPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {forms.length > 0 ? (
                 forms.map((form, index) => (
-                    <Link to={`/editor/${form._id}`} key={form._id}>
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className="bg-slate-800/50 rounded-2xl p-6 flex flex-col justify-between h-full hover:bg-slate-800 transition-colors"
-                        >
-                            <div>
-                                <h3 className="text-xl font-semibold mb-2 truncate">{form.title}</h3>
-                                <p className="text-gray-400 text-sm mb-4">{form.responses.length} response(s)</p>
-                            </div>
-                            <div className="flex gap-4 mt-auto border-t border-slate-700 pt-4">
-                                <button 
-                                  onClick={(e) => handleShare(form._id, e)}
-                                  className={`w-full py-2 rounded-lg text-sm font-semibold transition-colors ${
-                                    copiedFormId === form._id 
-                                    ? 'bg-green-500/20 text-green-300' 
-                                    // --- UPDATED HOVER CLASS FOR SHARE BUTTON ---
-                                    : 'bg-purple-500/20 text-purple-300 hover:bg-purple-600 hover:text-white'
-                                  }`}
-                                >
-                                  {copiedFormId === form._id ? 'Copied!' : 'Share'}
-                                </button>
-                                {/* --- UPDATED HOVER CLASS FOR EDIT BUTTON --- */}
+                    <div key={form._id} className="flex flex-col">
+                        <Link to={`/editor/${form._id}`} className="block bg-slate-800/50 rounded-t-2xl p-6 flex-grow hover:bg-slate-800 transition-colors">
+                            <h3 className="text-xl font-semibold mb-2 truncate">{form.title}</h3>
+                            <p className="text-gray-400 text-sm">{form.responses.length} response(s)</p>
+                        </Link>
+                        {/* --- UPDATED BUTTON CONTAINER --- */}
+                        <div className="bg-slate-800/50 rounded-b-2xl p-4 flex gap-2 border-t border-slate-700">
+                            <button 
+                              onClick={(e) => handleShare(form._id, e)}
+                              className={`w-full py-2 rounded-lg text-sm font-semibold transition-colors ${
+                                copiedFormId === form._id 
+                                ? 'bg-green-500/20 text-green-300' 
+                                : 'bg-purple-500/20 text-purple-300 hover:bg-purple-600 hover:text-white'
+                              }`}
+                            >
+                              {copiedFormId === form._id ? 'Copied!' : 'Share'}
+                            </button>
+                            <Link to={`/editor/${form._id}`} className="w-full">
                                 <button className="w-full bg-blue-500/20 text-blue-300 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 hover:text-white transition-colors">
                                   Edit
                                 </button>
-                            </div>
-                        </motion.div>
-                    </Link>
+                            </Link>
+                            {/* --- NEW DELETE BUTTON --- */}
+                            <button 
+                              onClick={(e) => handleDelete(form._id, form.title, e)}
+                              className="p-2 px-3 bg-red-500/20 text-red-300 rounded-lg text-sm font-semibold hover:bg-red-600 hover:text-white transition-colors"
+                              title="Delete Form"
+                            >
+                              🗑️
+                            </button>
+                        </div>
+                    </div>
                 ))
             ) : (
                 <div className="col-span-full text-center py-16 bg-slate-800/50 rounded-2xl">

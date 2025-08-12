@@ -1,4 +1,4 @@
-// src/pages/FormEditor.jsx
+// client/src/pages/FormEditor.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
@@ -48,17 +48,28 @@ const FormEditor = () => {
   }, [formId, isNewForm]);
 
   const handleTitleSave = async () => {
-    if (!hasUnsavedChanges || isNewForm) {
+    if (!hasUnsavedChanges) {
       setIsEditingTitle(false);
       return;
     }
     try {
-      const response = await axios.put(`http://localhost:5000/api/forms/${formId}`, { title: currentTitle });
-      setForm(response.data);
-      setCurrentTitle(response.data.title);
+      if (isNewForm) {
+        if (!user) throw new Error("User not found");
+        const formResponse = await axios.post('http://localhost:5000/api/forms', {
+          title: currentTitle,
+          userId: user.id
+        });
+        navigate(`/editor/${formResponse.data._id}`, { replace: true });
+      } else {
+        const response = await axios.put(`http://localhost:5000/api/forms/${formId}`, { title: currentTitle });
+        setForm(response.data);
+        setCurrentTitle(response.data.title);
+      }
     } catch (err) {
       console.error("Failed to update title", err);
-      setCurrentTitle(form.title);
+      if (form) {
+        setCurrentTitle(form.title);
+      }
     } finally {
       setIsEditingTitle(false);
     }
@@ -67,21 +78,16 @@ const FormEditor = () => {
   const handleSaveQuestion = async (questionData) => {
     try {
       let currentFormId = formId;
-
       if (isNewForm) {
         if (!user) throw new Error("User not found");
-        const formResponse = await axios.post('http://localhost:5000/api/forms', { 
+        const formResponse = await axios.post('http://localhost:5000/api/forms', {
           title: currentTitle,
           userId: user.id
         });
         currentFormId = formResponse.data._id;
-      }
-
-      const questionResponse = await axios.post(`http://localhost:5000/api/forms/${currentFormId}/questions`, questionData);
-      
-      if (isNewForm) {
         navigate(`/editor/${currentFormId}`, { replace: true });
       } else {
+        await axios.post(`http://localhost:5000/api/forms/${formId}/questions`, questionData);
         const updatedForm = await axios.get(`http://localhost:5000/api/forms/${formId}`);
         setForm(updatedForm.data);
         setActiveBuilder(null);
@@ -91,7 +97,7 @@ const FormEditor = () => {
       console.error(err);
     }
   };
-
+  
   const handleHeaderImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file || isNewForm) return;
@@ -112,7 +118,6 @@ const FormEditor = () => {
       const updateResponse = await axios.put(`http://localhost:5000/api/forms/${formId}`, { headerImage: imageUrl });
       
       setForm(updateResponse.data);
-      alert("Header image uploaded successfully!");
     } catch (err) {
       alert('Failed to upload header image.');
     }
@@ -128,8 +133,25 @@ const FormEditor = () => {
   };
 
   const handleViewForm = () => {
-    if (isNewForm) return;
-    window.open(`/form/${formId}`, '_blank');
+    if (!isNewForm) {
+      window.open(`/form/${formId}`, '_blank');
+    }
+  };
+
+  // --- NEW DELETE HANDLER FOR EDITOR PAGE ---
+  const handleDeleteForm = async () => {
+      if (isNewForm) return;
+
+      if (window.confirm(`Are you sure you want to delete "${form.title}"? This is permanent.`)) {
+          try {
+              await axios.delete(`http://localhost:5000/api/forms/${formId}`);
+              alert('Form deleted successfully.');
+              navigate('/dashboard'); // Redirect to dashboard after deletion
+          } catch (error) {
+              console.error('Failed to delete form', error);
+              alert('Could not delete form. Please try again.');
+          }
+      }
   };
 
   if (loading) return <div className="p-8 text-center text-xl font-semibold">Loading Editor...</div>;
@@ -159,8 +181,8 @@ const FormEditor = () => {
                 ) : (
                     <h1
                         className="text-4xl font-bold cursor-pointer hover:bg-slate-700/50 p-2 -m-2 rounded-md"
-                        onClick={() => !isNewForm && setIsEditingTitle(true)}
-                        title={isNewForm ? "Save the form by adding a question to enable editing" : "Click to edit title"}
+                        onClick={() => setIsEditingTitle(true)}
+                        title={"Click to edit title"}
                     >
                         {currentTitle}
                     </h1>
@@ -210,30 +232,42 @@ const FormEditor = () => {
         )}
       </div>
 
-      <div className="mt-12 border-t border-slate-700 pt-6 flex justify-end items-center gap-4">
+      {/* --- UPDATED ACTION BUTTONS CONTAINER --- */}
+      <div className="mt-12 border-t border-slate-700 pt-6 flex justify-between items-center gap-4">
+        {/* New Delete Button */}
         <button
-          onClick={handleShare}
-          disabled={isNewForm}
-          className={`py-2 px-5 rounded-lg text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-            copied ? 'bg-green-600' : 'bg-purple-600 hover:bg-purple-700'
-          }`}
+            onClick={handleDeleteForm}
+            disabled={isNewForm}
+            className="py-2 px-5 rounded-lg text-white font-semibold bg-red-800 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {copied ? 'Copied!' : 'Share'}
+          Delete Form
         </button>
-        <button
-          onClick={handleViewForm}
-          disabled={isNewForm}
-          className="py-2 px-5 rounded-lg text-white font-semibold bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Preview
-        </button>
-        <button
-          onClick={handleTitleSave}
-          disabled={!hasUnsavedChanges || isNewForm}
-          className="py-2 px-5 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Save Changes
-        </button>
+        {/* Existing Buttons */}
+        <div className="flex justify-end items-center gap-4">
+            <button
+              onClick={handleShare}
+              disabled={isNewForm}
+              className={`py-2 px-5 rounded-lg text-white font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                copied ? 'bg-green-600' : 'bg-purple-600 hover:bg-purple-700'
+              }`}
+            >
+              {copied ? 'Copied!' : 'Share'}
+            </button>
+            <button
+              onClick={handleViewForm}
+              disabled={isNewForm}
+              className="py-2 px-5 rounded-lg text-white font-semibold bg-blue-600 hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Preview
+            </button>
+            <button
+              onClick={handleTitleSave}
+              disabled={!hasUnsavedChanges}
+              className="py-2 px-5 rounded-lg text-white font-semibold bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Changes
+            </button>
+        </div>
       </div>
     </motion.div>
   );

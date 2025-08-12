@@ -16,7 +16,6 @@ const Header = () => {
   }, []);
 
   return (
-    // This `fixed` class is crucial. It makes the header float on top.
     <motion.header 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -24,7 +23,8 @@ const Header = () => {
       className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${scrolled ? 'bg-[#0A0F1F]/80 backdrop-blur-sm border-b border-slate-800' : 'bg-transparent'}`}
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        <Link to="/" className="text-2xl font-bold text-white drop-shadow-md">
+        {/* --- THIS IS THE ONLY CHANGE --- */}
+        <Link to="/" className="text-3xl font-bold text-white drop-shadow-md">
           Structa<span className="text-blue-400">Quiz</span>
         </Link>
         <div className="flex items-center gap-6">
