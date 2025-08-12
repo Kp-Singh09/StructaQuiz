@@ -12,7 +12,13 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+// Configure CORS to only allow requests from your specific frontend URL
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, 
+  optionsSuccessStatus: 200 
+};
+app.use(cors(corsOptions));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -31,6 +37,6 @@ app.use('/api/stats', statsRoutes);
 // Database Connection and Server Start
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI) // <-- Just the URI is needed now
+mongoose.connect(process.env.MONGO_URI)
   .then(() => app.listen(PORT, () => console.log(`Server running on port: ${PORT}`)))
   .catch((error) => console.error(`${error} did not connect`));
