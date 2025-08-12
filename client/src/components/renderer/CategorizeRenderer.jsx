@@ -1,12 +1,13 @@
+// src/components/renderer/CategorizeRenderer.jsx
 import { useState, useEffect } from 'react';
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 
 function DraggableItem({ id, children }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
-  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 100 } : undefined;
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="bg-white p-3 rounded-md shadow border cursor-grab">
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="bg-slate-700 p-3 rounded-md shadow border border-slate-600 cursor-grab text-white">
       {children}
     </div>
   );
@@ -15,22 +16,23 @@ function DraggableItem({ id, children }) {
 function DroppableCategory({ id, children, title }) {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className="bg-gray-100 p-4 rounded-lg min-h-[100px] border-2 border-dashed">
-      <h4 className="font-bold mb-4 text-center">{title}</h4>
-      <div className="space-y-2">{children}</div>
+    <div ref={setNodeRef} className="bg-slate-900/50 p-4 rounded-lg border-2 border-dashed border-slate-700 min-h-[150px]">
+      <h4 className="font-bold mb-4 text-center text-slate-300">{title}</h4>
+      <div className="space-y-3">{children}</div>
     </div>
   );
 }
+
 
 const CategorizeRenderer = ({ question, onAnswerChange }) => {
   const [itemLists, setItemLists] = useState({
     unassigned: question.items.map(item => item.text),
     ...Object.fromEntries(question.categories.map(cat => [cat, []]))
   });
+
   useEffect(() => {
     onAnswerChange(question._id, itemLists);
   }, [itemLists, question._id, onAnswerChange]);
-
 
   const handleDragEnd = (event) => {
     const { over, active } = event;
@@ -50,9 +52,9 @@ const CategorizeRenderer = ({ question, onAnswerChange }) => {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      {question.image && <img src={question.image} alt="Question visual" className="w-full h-40 object-cover rounded-md mb-4" />}
-        <h3 className="text-xl font-bold mb-4 text-gray-800">Categorize These Items</h3>
+      <div className="bg-slate-800/50 p-6 rounded-lg shadow-md">
+        {question.image && <img src={question.image} alt="Question visual" className="w-full h-48 object-cover rounded-md mb-6" />}
+        <h3 className="text-2xl font-bold mb-4 text-white">Categorize These Items</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <DroppableCategory id="unassigned" title="Items">
             {itemLists.unassigned.map(item => <DraggableItem key={item} id={item}>{item}</DraggableItem>)}

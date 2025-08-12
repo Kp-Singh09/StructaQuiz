@@ -1,19 +1,10 @@
-// client/src/App.jsx
-import { Routes, Route } from 'react-router-dom';
-import FormEditor from './pages/FormEditor';
-import FormRenderer from './pages/FormRenderer';
-import HomePage from './pages/HomePage';
+// src/App.jsx
+import { Outlet } from 'react-router-dom';
 
 function App() {
-  return (
-    <div className="bg-gray-100 min-h-screen">
-         <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/editor/:formId" element={<FormEditor />} />
-            <Route path="/form/:formId" element={<FormRenderer />} />
-        </Routes>
-    </div>
-  );
+  // The Header is removed from here.
+  // Layouts are now handled by specific route groups (PublicLayout and ProtectedLayout).
+  return <Outlet />;
 }
 
 export default App;

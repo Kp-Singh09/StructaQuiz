@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import formRoutes from './routes/formRoutes.js'; 
 import responseRoutes from './routes/responseRoutes.js';
 import imageKitRoutes from './routes/imageKitRoutes.js'; 
+import statsRoutes from './routes/statsRoutes.js';
 
 // Initialize App
 dotenv.config();
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 app.use('/api/forms', formRoutes);
 app.use('/api/responses', responseRoutes);
 app.use('/api/imagekit', imageKitRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Database Connection and Server Start
 const PORT = process.env.PORT || 5000;

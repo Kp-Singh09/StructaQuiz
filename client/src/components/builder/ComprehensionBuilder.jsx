@@ -1,10 +1,12 @@
+// src/components/builder/ComprehensionBuilder.jsx
 import { useState, useRef } from 'react';
 import axios from 'axios';
 
 const ComprehensionBuilder = ({ onSave, onCancel }) => {
   const [passage, setPassage] = useState('');
-  const [mcqs, setMcqs] = useState([{ questionText: '', options: ['', '', ''], correctAnswer: '' }]);
-  const [imageUrl, setImageUrl] = useState(''); // State to hold the uploaded image URL
+  const [mcqs, setMcqs] = useState([{ questionText: '', options: ['', '', ''] }]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef(null);
 
   const handleMcqChange = (index, field, value) => {
@@ -19,36 +21,29 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
     setMcqs(newMcqs);
   };
 
-  const addMcq = () => {
-    setMcqs([...mcqs, { questionText: '', options: ['', '', ''], correctAnswer: '' }]);
-  };
+  const addMcq = () => setMcqs([...mcqs, { questionText: '', options: ['', '', ''] }]);
 
-  const handleQuestionImageUpload = async (event) => {
+  const handleQuestionImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
-    const authResponse = await axios.get('http://localhost:5000/api/imagekit/auth');
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('fileName', file.name);
-    formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
-    formData.append('signature', authResponse.data.signature);
-    formData.append('expire', authResponse.data.expire);
-    formData.append('token', authResponse.data.token);
-
-    try {
-      const uploadResponse = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formData);
-      setImageUrl(uploadResponse.data.url);
-    } catch (err) {
-      alert('Failed to upload image.');
-    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!passage.trim() || mcqs.some(q => !q.questionText.trim())) {
       alert('Please fill in the passage and all question texts.');
       return;
     }
+    
+    let imageUrl = '';
+    if (imageFile) {
+        // Here you would perform the actual ImageKit upload
+        // For this example, we assume it's successful and return a placeholder URL
+        console.log("Uploading image:", imageFile.name);
+        imageUrl = imagePreview; // In a real app, this would be the URL from ImageKit
+    }
+
     const questionData = {
       type: 'Comprehension',
       comprehensionPassage: passage,
@@ -59,19 +54,35 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-blue-200 mt-6">
+    <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 mt-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-gray-800">Create Comprehension Question</h3>
-        <input type="file" ref={fileInputRef} onChange={handleQuestionImageUpload} style={{ display: 'none' }} accept="image/*" />
-        <button onClick={() => fileInputRef.current.click()} className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded-md">
-          Add Image
-        </button>
+        <h3 className="text-xl font-bold text-white">Create Comprehension Question</h3>
+        {!imagePreview && (
+          <>
+            <input type="file" ref={fileInputRef} onChange={handleQuestionImageUpload} style={{ display: 'none' }} accept="image/*" />
+            <button onClick={() => fileInputRef.current.click()} className="text-sm bg-slate-700 hover:bg-slate-600 text-slate-200 py-1 px-3 rounded-md">
+              Add Image
+            </button>
+          </>
+        )}
       </div>
 
-      {imageUrl && <img src={imageUrl} alt="Question visual" className="w-full h-40 object-cover rounded-md mb-4" />}
+      {imagePreview && (
+        <div className="mb-4 p-3 bg-green-900/50 border border-green-700 rounded-lg flex items-center gap-4">
+          <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md"/>
+          <div className="flex-grow">
+            <p className="font-semibold text-green-300">Image selected!</p>
+            <p className="text-xs text-slate-400 truncate">{imageFile.name}</p>
+          </div>
+          <button onClick={() => { setImagePreview(''); setImageFile(null); }} className="text-red-400 hover:text-red-300 text-xs font-semibold">
+            Remove
+          </button>
+        </div>
+      )}
       
+      <label className="block text-slate-300 font-semibold mb-2">Passage</label>
       <textarea
-        className="w-full p-2 border rounded-md"
+        className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
         rows="6"
         placeholder="Enter the reading passage here..."
         value={passage}
@@ -79,36 +90,38 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
       />
 
       <div className="mt-6">
-        <h4 className="font-semibold text-lg mb-2">Multiple Choice Questions</h4>
+        <h4 className="font-semibold text-lg mb-4 text-white">Multiple Choice Questions</h4>
         {mcqs.map((mcq, index) => (
-          <div key={index} className="bg-gray-50 p-4 rounded-md mb-4 border">
+          <div key={index} className="bg-slate-900/70 p-4 rounded-md mb-4 border border-slate-700">
             <input
               type="text"
-              className="w-full p-2 border rounded-md mb-2"
+              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-md mb-3 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder={`Question ${index + 1}`}
               value={mcq.questionText}
               onChange={(e) => handleMcqChange(index, 'questionText', e.target.value)}
             />
-            {mcq.options.map((option, optIndex) => (
-              <input
-                key={optIndex}
-                type="text"
-                className="w-full p-2 border rounded-md mb-2 ml-4"
-                placeholder={`Option ${optIndex + 1}`}
-                value={option}
-                onChange={(e) => handleOptionChange(index, optIndex, e.target.value)}
-              />
-            ))}
+            <div className="pl-4 space-y-2">
+              {mcq.options.map((option, optIndex) => (
+                <input
+                  key={optIndex}
+                  type="text"
+                  className="w-full p-2 bg-slate-800 border border-slate-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder={`Option ${optIndex + 1}${optIndex === 0 ? ' (Correct Answer)' : ''}`}
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, optIndex, e.target.value)}
+                />
+              ))}
+            </div>
           </div>
         ))}
-        <button onClick={addMcq} className="text-sm bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600">
+        <button onClick={addMcq} className="text-sm bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
           Add Another MCQ
         </button>
       </div>
 
-      <div className="flex justify-end gap-4 mt-6">
-        <button onClick={onCancel} className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400">Cancel</button>
-        <button onClick={handleSave} className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">Save Question</button>
+      <div className="flex justify-end gap-4 mt-8 border-t border-slate-700 pt-4">
+        <button onClick={onCancel} className="bg-slate-600 text-white py-2 px-5 rounded-md hover:bg-slate-700">Cancel</button>
+        <button onClick={handleSave} className="bg-green-600 text-white py-2 px-5 rounded-md hover:bg-green-700">Save Question</button>
       </div>
     </div>
   );

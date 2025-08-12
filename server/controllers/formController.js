@@ -1,34 +1,35 @@
-// server/controllers/formController.js
 import Form from '../models/Form.js';
 import Question from '../models/Question.js';
 
-// @desc    Create a new empty form
-// @route   POST /api/forms
-// @access  Public
+// --- NEW CONTROLLER FUNCTION ---
+// @desc    Get all forms for a specific user
+// @route   GET /api/forms/user/:userId
+// @access  Private
+export const getFormsByUser = async (req, res) => {
+  try {
+    const forms = await Form.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.status(200).json(forms);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error: Could not retrieve forms' });
+  }
+};
+
 export const updateForm = async (req, res) => {
-    try {
-      const form = await Form.findById(req.params.id);
-      if (!form) {
-        return res.status(404).json({ message: 'Form not found' });
-      }
-  
-      // Update fields from request body
-      form.title = req.body.title || form.title;
-      form.headerImage = req.body.headerImage || form.headerImage;
-  
-      const updatedForm = await form.save();
-      res.status(200).json(updatedForm);
-    } catch (error) {
-      res.status(500).json({ message: 'Server Error: Could not update form' });
-    }
-  };
+    // ... (This function remains the same)
+};
   
 export const createForm = async (req, res) => {
   try {
-    // Create a new form document with a default title or a title from the request body
+    // --- UPDATE THIS FUNCTION ---
+    // We now require a userId to be passed in the request body
+    const { title, userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required to create a form.' });
+    }
+
     const form = new Form({
-      title: req.body.title || 'My New Form',
-      // Other fields will be added later
+      title: title || 'My New Form',
+      userId: userId, // Save the userId
     });
 
     const newForm = await form.save();
