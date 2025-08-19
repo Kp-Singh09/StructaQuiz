@@ -37,9 +37,9 @@ const ComprehensionBreakdown = ({ question, userAnswer }) => (
       const isMcqCorrect = userChoice === mcq.correctAnswer;
       return (
         <div key={mcq._id} className="text-sm">
-          <p className="text-slate-300">Q{index + 1}: {mcq.questionText}</p>
-          <p className={`pl-4 ${isMcqCorrect ? 'text-green-400' : 'text-red-400'}`}>Your Answer: {userChoice}</p>
-          {!isMcqCorrect && <p className="pl-4 text-green-400">Correct Answer: {mcq.correctAnswer}</p>}
+          <p className="text-gray-700">Q{index + 1}: {mcq.questionText}</p>
+          <p className={`pl-4 ${isMcqCorrect ? 'text-green-600' : 'text-red-600'}`}>Your Answer: {userChoice}</p>
+          {!isMcqCorrect && <p className="pl-4 text-green-700">Correct Answer: {mcq.correctAnswer}</p>}
         </div>
       );
     })}
@@ -49,20 +49,20 @@ const ComprehensionBreakdown = ({ question, userAnswer }) => (
 const CategorizeBreakdown = ({ question, userAnswer }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
     <div>
-      <h5 className="font-semibold text-slate-200 mb-2">Your Answer:</h5>
+      <h5 className="font-semibold text-gray-800 mb-2">Your Answer:</h5>
       {Object.entries(userAnswer).map(([category, items]) => (
         <div key={category}>
-            <p className="text-slate-300 font-medium">{category}:</p>
-            <p className="pl-4 text-slate-400">{Array.isArray(items) && items.length > 0 ? items.join(', ') : 'Empty'}</p>
+            <p className="text-gray-700 font-medium">{category}:</p>
+            <p className="pl-4 text-gray-600">{Array.isArray(items) && items.length > 0 ? items.join(', ') : 'Empty'}</p>
         </div>
       ))}
     </div>
     <div>
-      <h5 className="font-semibold text-green-400 mb-2">Correct Answer:</h5>
+      <h5 className="font-semibold text-green-700 mb-2">Correct Answer:</h5>
       {question.categories.map(category => (
         <div key={category}>
-            <p className="text-slate-300 font-medium">{category}:</p>
-            <p className="pl-4 text-green-400">{question.items.filter(i => i.category === category).map(i => i.text).join(', ')}</p>
+            <p className="text-gray-700 font-medium">{category}:</p>
+            <p className="pl-4 text-green-600">{question.items.filter(i => i.category === category).map(i => i.text).join(', ')}</p>
         </div>
       ))}
     </div>
@@ -71,10 +71,10 @@ const CategorizeBreakdown = ({ question, userAnswer }) => (
 
 const ClozeBreakdown = ({ question, userAnswer }) => (
     <div className="text-sm">
-        <h5 className="font-semibold text-slate-200 mb-2">Your Answer:</h5>
-        <p className="text-slate-300">{Object.values(userAnswer).join(', ')}</p>
-        <h5 className="font-semibold text-green-400 my-2">Correct Answer:</h5>
-        <p className="text-green-400">{question.options.join(', ')}</p>
+        <h5 className="font-semibold text-gray-800 mb-2">Your Answer:</h5>
+        <p className="text-gray-700">{Object.values(userAnswer).join(', ')}</p>
+        <h5 className="font-semibold text-green-700 my-2">Correct Answer:</h5>
+        <p className="text-green-600">{question.options.join(', ')}</p>
     </div>
 );
 
@@ -97,18 +97,18 @@ const AnswerCard = ({ answerData, index }) => {
   };
 
   return (
-    <div className={`bg-slate-800/50 p-6 rounded-lg border-l-4 ${wasCorrect ? 'border-green-500' : 'border-red-500'}`}>
+    <div className={`bg-white p-6 rounded-lg border-l-4 ${wasCorrect ? 'border-green-500' : 'border-red-500'} shadow-sm`}>
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-white">Question #{index + 1}: {questionId.type}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Question #{index + 1}: {questionId.type}</h3>
         {wasCorrect ? (
-          <span className="text-sm font-bold text-green-400 bg-green-900/50 px-3 py-1 rounded-full">Correct</span>
+          <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1 rounded-full">Correct</span>
         ) : (
-          <span className="text-sm font-bold text-red-400 bg-red-900/50 px-3 py-1 rounded-full">Incorrect</span>
+          <span className="text-sm font-bold text-red-700 bg-red-100 px-3 py-1 rounded-full">Incorrect</span>
         )}
       </div>
-      <p className="mt-2 text-slate-300 italic text-sm">{questionId.passage || questionId.comprehensionPassage || 'Categorize the following items:'}</p>
+      <p className="mt-2 text-gray-600 italic text-sm">{questionId.passage || questionId.comprehensionPassage || 'Categorize the following items:'}</p>
       
-      <div className="mt-4 border-t border-slate-700 pt-4">
+      <div className="mt-4 border-t border-gray-200 pt-4">
         {renderBreakdown()}
       </div>
     </div>

@@ -34,26 +34,26 @@ const VerticalSidebar = () => {
   }, [user, formId]);
 
   return (
-    // --- 1. Use Flexbox to structure the entire sidebar ---
-    <aside className="fixed top-0 left-0 w-64 h-full bg-[#101828] border-r border-slate-800 z-40 flex flex-col">
-      <div className="h-20 flex items-center px-6 border-b border-slate-800 flex-shrink-0">
-        <Link to="/" className="text-2xl font-bold text-white drop-shadow-md">
-          Structa<span className="text-blue-400">Quiz</span>
+    // Palette 2: Using bg-sky-200 for a soft, distinct sidebar
+    <aside className="fixed top-0 left-0 w-64 h-full bg-sky-100  z-40 flex flex-col">
+      <div className="h-20 flex items-center px-6 border-b border-sky-300/70 flex-shrink-0">
+        <Link to="/" className="text-3xl font-bold text-slate-800 drop-shadow-md">
+          Structa<span className="text-blue-600">Quiz</span>
         </Link>
       </div>
 
-      {/* --- 2. Main navigation links (static section) --- */}
-      <nav className="p-4 flex-shrink-0">
+      <nav className="p-4 flex-shrink-0 border-r border-sky-300/70">
         <div className="flex flex-col gap-4">
           {navItems.map((item, index) => (
             <motion.div key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <NavLink
                 to={item.href}
                 className={({ isActive }) =>
+                  // Updated styles for the new sky-colored sidebar
                   `flex items-center gap-4 px-4 py-3 rounded-lg transition-colors text-lg font-medium ${
                     isActive && !formId
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                      ? "bg-sky-500 text-white font-bold shadow-md"
+                      : "text-gray-700 hover:bg-sky-300/50 hover:text-gray-800"
                   }`
                 }
               >
@@ -65,11 +65,10 @@ const VerticalSidebar = () => {
         </div>
       </nav>
 
-      {/* --- 3. Created Forms (flexible, scrollable section) --- */}
       <div className="p-4 pt-0 flex flex-col flex-grow min-h-0">
           <button
               onClick={() => setIsFormsExpanded(!isFormsExpanded)}
-              className="w-full flex justify-between items-center text-left text-sm font-semibold text-slate-500 px-4 py-2 rounded-md hover:bg-slate-700/50 flex-shrink-0"
+              className="w-full flex justify-between items-center text-left text-sm font-semibold text-sky-800/60 px-4 py-2 rounded-md hover:bg-sky-300/40 flex-shrink-0"
           >
               <span>CREATED FORMS</span>
               <motion.span animate={{ rotate: isFormsExpanded ? 0 : -90 }}>▼</motion.span>
@@ -82,7 +81,6 @@ const VerticalSidebar = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                   >
-                      {/* --- 4. Inner div handles the actual scrolling --- */}
                       <div className="mt-2 space-y-1 overflow-y-auto pr-2" style={{ maxHeight: 'calc(100% - 1rem)' }}>
                           {userForms.length > 0 ? userForms.map(form => (
                               <NavLink
@@ -91,8 +89,8 @@ const VerticalSidebar = () => {
                                   className={({ isActive }) =>
                                       `block text-sm px-4 py-2 rounded-md truncate ${
                                           isActive
-                                          ? 'bg-slate-700 text-white'
-                                          : 'text-slate-400 hover:bg-slate-700/50 hover:text-white'
+                                          ? 'bg-sky-300/70 text-sky-900 font-semibold'
+                                          : 'text-gray-600 hover:bg-sky-300/40 hover:text-gray-800'
                                       }`
                                   }
                               >

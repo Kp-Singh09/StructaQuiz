@@ -16,7 +16,6 @@ const DashboardPage = () => {
     if (user) {
       const fetchUserForms = async () => {
         try {
-          // --- FIX 1: Correctly access the environment variable ---
           const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/forms/user/${user.id}`);
           setForms(response.data);
         } catch (error) {
@@ -50,7 +49,6 @@ const DashboardPage = () => {
 
     if (window.confirm(`Are you sure you want to delete "${formTitle}"? This action cannot be undone.`)) {
       try {
-        // --- FIX 2: Correctly access the environment variable here too ---
         await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/forms/${formId}`);
         setForms(forms.filter(form => form._id !== formId));
       } catch (error) {
@@ -63,7 +61,7 @@ const DashboardPage = () => {
   if (loading) {
     return (
         <div className="flex items-center justify-center p-8">
-            <p className="text-slate-400">Loading your forms...</p>
+            <p className="text-gray-500">Loading your forms...</p>
         </div>
     );
   }
@@ -71,7 +69,7 @@ const DashboardPage = () => {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex justify-between items-center mb-10">
-            <h1 className="text-4xl font-bold">Your Forms</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Your Forms</h1>
             <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -84,32 +82,31 @@ const DashboardPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {forms.length > 0 ? (
-                forms.map((form, index) => (
-                    <div key={form._id} className="flex flex-col">
-                        {/* --- FIX 3: Links should be internal routes, not full URLs --- */}
-                        <Link to={`/editor/${form._id}`} className="block bg-slate-800/50 rounded-t-2xl p-6 flex-grow hover:bg-slate-800 transition-colors">
-                            <h3 className="text-xl font-semibold mb-2 truncate">{form.title}</h3>
-                            <p className="text-gray-400 text-sm">{form.responses.length} response(s)</p>
+                forms.map((form) => (
+                    <div key={form._id} className="flex flex-col bg-white rounded-xl shadow-md border border-gray-200 border-t-4 border-t-blue-400">
+                        <Link to={`/editor/${form._id}`} className="block p-6 flex-grow hover:bg-gray-50 rounded-t-xl transition-colors">
+                            <h3 className="text-xl font-semibold mb-2 truncate text-gray-800">{form.title}</h3>
+                            <p className="text-gray-500 text-sm">{form.responses.length} response(s)</p>
                         </Link>
-                        <div className="bg-slate-800/50 rounded-b-2xl p-4 flex gap-2 border-t border-slate-700">
+                        <div className="p-4 flex gap-2 border-t border-gray-200">
                             <button 
                               onClick={(e) => handleShare(form._id, e)}
                               className={`w-full py-2 rounded-lg text-sm font-semibold transition-colors ${
                                 copiedFormId === form._id 
-                                ? 'bg-green-500/20 text-green-300' 
-                                : 'bg-purple-500/20 text-purple-300 hover:bg-purple-600 hover:text-white'
+                                ? 'bg-green-100 text-green-700' 
+                                : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                               }`}
                             >
                               {copiedFormId === form._id ? 'Copied!' : 'Share'}
                             </button>
                             <Link to={`/editor/${form._id}`} className="w-full">
-                                <button className="w-full bg-blue-500/20 text-blue-300 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 hover:text-white transition-colors">
+                                <button className="w-full bg-blue-100 text-blue-700 py-2 rounded-lg text-sm font-semibold hover:bg-blue-200 transition-colors">
                                   Edit
                                 </button>
                             </Link>
                             <button 
                               onClick={(e) => handleDelete(form._id, form.title, e)}
-                              className="p-2 px-3 bg-red-500/20 text-red-300 rounded-lg text-sm font-semibold hover:bg-red-600 hover:text-white transition-colors"
+                              className="p-2 px-3 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
                               title="Delete Form"
                             >
                               🗑️
@@ -118,9 +115,9 @@ const DashboardPage = () => {
                     </div>
                 ))
             ) : (
-                <div className="col-span-full text-center py-16 bg-slate-800/50 rounded-2xl">
-                    <h3 className="text-2xl font-semibold">No forms yet!</h3>
-                    <p className="text-gray-400 mt-2">Click "Create New Form" to get started.</p>
+                <div className="col-span-full text-center py-16 bg-white rounded-xl border border-gray-200 shadow-md border-t-4 border-t-blue-400">
+                    <h3 className="text-2xl font-semibold text-gray-800">No forms yet!</h3>
+                    <p className="text-gray-500 mt-2">Click "Create New Form" to get started.</p>
                 </div>
             )}
         </div>

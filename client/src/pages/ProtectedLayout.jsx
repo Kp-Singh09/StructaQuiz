@@ -5,19 +5,15 @@ import HorizontalNavbar from '../components/HorizontalNavbar';
 
 const ProtectedLayout = () => {
   return (
-    <div className="min-h-screen bg-[#0A0F1F] text-white">
+    <div className="min-h-screen bg-sky-50 text-gray-800">
       <VerticalSidebar />
       <HorizontalNavbar />
       
-      {/* Main content container, offset by the sidebar's width */}
-      <main className="ml-64">
-        {/* 1. This is a new empty div that acts as a spacer. 
-               It has the same height as the navbar (h-20), pushing everything below it down. */}
-        <div className="h-20" />
+      <main className="ml-64 flex flex-col h-screen">
+        <div className="h-20 flex-shrink-0" />
 
-        {/* 2. The grid background is now on this inner container,
-               which starts perfectly below the navbar. */}
-        <div className="p-8 bg-[length:80px_80px] bg-[linear-gradient(transparent_79px,#232733_80px),linear-gradient(90deg,transparent_79px,#232733_80px)]">
+        {/* Added 'overflow-y-auto' to make this container scrollable */}
+        <div className="flex-grow p-8 overflow-y-auto bg-[length:80px_80px] bg-[linear-gradient(transparent_78px,rgba(59,130,246,0.3)_80px),linear-gradient(90deg,transparent_78px,rgba(59,130,246,0.3)_80px)]">
           <Outlet />
         </div>
       </main>

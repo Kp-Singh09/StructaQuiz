@@ -40,7 +40,6 @@ const FormRenderer = () => {
       return;
     }
     try {
-      // Capture the response from the backend
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/responses`, {
         formId,
         answers: Object.entries(answers).map(([questionId, answer]) => ({ questionId, answer })),
@@ -48,7 +47,6 @@ const FormRenderer = () => {
         userEmail: user.primaryEmailAddress.emailAddress,
       });
       
-      // Extract the new responseId and redirect
       const { responseId } = response.data;
       if (responseId) {
         navigate(`/results/${responseId}`);
@@ -61,24 +59,23 @@ const FormRenderer = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#0A0F1F] flex items-center justify-center text-white text-xl">Loading Form...</div>;
-  if (error) return <div className="min-h-screen bg-[#0A0F1F] flex items-center justify-center text-red-500 text-xl">{error}</div>;
+  if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-800 text-xl">Loading Form...</div>;
+  if (error) return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-red-500 text-xl">{error}</div>;
   if (!form) return null;
 
   return (
-    <div className="min-h-screen bg-[#0A0F1F] text-white py-16 px-4">
+    <div className="min-h-screen text-gray-800 py-16 px-4 bg-[#f8f7f4] bg-[length:80px_80px] bg-[linear-gradient(transparent_78px,rgba(59,130,246,0.3)_80px),linear-gradient(90deg,transparent_78px,rgba(59,130,246,0.3)_80px)]">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-slate-800/50 p-8 rounded-lg shadow-lg mb-10 text-center">
-          {/* --- THIS IS THE CORRECTED LINE --- */}
-          {/* It checks if form.headerImage exists and then renders the img tag */}
+        {/* The blue top border has been removed from this card */}
+        <div className="bg-white p-8 rounded-lg shadow-md mb-10 text-center border border-gray-200">
           {form.headerImage && (
             <img 
               src={form.headerImage} 
               alt="Form Header" 
-              className="w-full h-56 object-cover rounded-t-lg mb-8 -mx-8 -mt-8" 
+              className="w-full h-56 object-cover rounded-md mb-8" 
             />
           )}
-          <h1 className="text-4xl font-bold">{form.title}</h1>
+          <h1 className="text-4xl font-bold text-gray-900">{form.title}</h1>
         </div>
         
         <div className="space-y-8">

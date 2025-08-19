@@ -26,30 +26,31 @@ const ResponsesListPage = () => {
     }
   }, [user]);
 
-  if (loading) return <p className="text-center text-slate-400">Loading your forms...</p>;
+  if (loading) return <p className="text-center text-gray-500">Loading your forms...</p>;
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <h1 className="text-4xl font-bold mb-8">Form Responses</h1>
+      <h1 className="text-4xl font-bold mb-8 text-gray-900">Form Responses</h1>
       
       {forms.length > 0 ? (
         <div className="space-y-6">
           {forms.map(form => (
-            <div key={form._id} className="bg-slate-800/50 p-6 rounded-lg flex justify-between items-center">
+            <div key={form._id} className="bg-white p-6 rounded-lg flex justify-between items-center border border-gray-200 shadow-md border-t-4 border-t-blue-400">
               <div>
-                <h2 className="text-xl font-semibold">{form.title}</h2>
-                <p className="text-sm text-slate-400 mt-1">{form.responses.length} response(s)</p>
+                <h2 className="text-xl font-semibold text-gray-800">{form.title}</h2>
+                <p className="text-sm text-gray-500 mt-1">{form.responses.length} response(s)</p>
               </div>
-              <Link to={`/responses/${form._id}`} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition-colors">
+              {/* Updated button color to match the active sidebar link */}
+              <Link to={`/responses/${form._id}`} className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-5 rounded-lg transition-colors">
                 Check Responses
               </Link>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 bg-slate-800/50 rounded-lg">
-          <h3 className="text-2xl font-semibold">You haven't created any forms yet.</h3>
-          <p className="text-gray-400 mt-2">Create a new form to start collecting responses.</p>
+        <div className="text-center py-16 bg-white rounded-lg border border-gray-200 shadow-md border-t-4 border-t-blue-400">
+          <h3 className="text-2xl font-semibold text-gray-800">You haven't created any forms yet.</h3>
+          <p className="text-gray-500 mt-2">Create a new form to start collecting responses.</p>
         </div>
       )}
     </motion.div>

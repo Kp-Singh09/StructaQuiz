@@ -1,6 +1,5 @@
 // src/components/builder/ComprehensionBuilder.jsx
 import { useState, useRef } from 'react';
-import axios from 'axios';
 
 const ComprehensionBuilder = ({ onSave, onCancel }) => {
   const [passage, setPassage] = useState('');
@@ -38,10 +37,8 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
     
     let imageUrl = '';
     if (imageFile) {
-        // Here you would perform the actual ImageKit upload
-        // For this example, we assume it's successful and return a placeholder URL
         console.log("Uploading image:", imageFile.name);
-        imageUrl = imagePreview; // In a real app, this would be the URL from ImageKit
+        imageUrl = imagePreview; 
     }
 
     const questionData = {
@@ -54,13 +51,13 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
   };
 
   return (
-    <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 mt-6 animate-fadeIn">
+    <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-md mt-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-white">Create Comprehension Question</h3>
+        <h3 className="text-xl font-bold text-gray-900">Create Comprehension Question</h3>
         {!imagePreview && (
           <>
             <input type="file" ref={fileInputRef} onChange={handleQuestionImageUpload} style={{ display: 'none' }} accept="image/*" />
-            <button onClick={() => fileInputRef.current.click()} className="text-sm bg-slate-700 hover:bg-slate-600 text-slate-200 py-1 px-3 rounded-md">
+            <button onClick={() => fileInputRef.current.click()} className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded-md">
               Add Image
             </button>
           </>
@@ -68,21 +65,21 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
       </div>
 
       {imagePreview && (
-        <div className="mb-4 p-3 bg-green-900/50 border border-green-700 rounded-lg flex items-center gap-4">
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-4">
           <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md"/>
           <div className="flex-grow">
-            <p className="font-semibold text-green-300">Image selected!</p>
-            <p className="text-xs text-slate-400 truncate">{imageFile.name}</p>
+            <p className="font-semibold text-green-800">Image selected!</p>
+            <p className="text-xs text-gray-500 truncate">{imageFile.name}</p>
           </div>
-          <button onClick={() => { setImagePreview(''); setImageFile(null); }} className="text-red-400 hover:text-red-300 text-xs font-semibold">
+          <button onClick={() => { setImagePreview(''); setImageFile(null); }} className="text-red-600 hover:text-red-800 text-xs font-semibold">
             Remove
           </button>
         </div>
       )}
       
-      <label className="block text-slate-300 font-semibold mb-2">Passage</label>
+      <label className="block text-gray-700 font-semibold mb-2">Passage</label>
       <textarea
-        className="w-full p-3 bg-slate-900 border border-slate-700 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="w-full p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         rows="6"
         placeholder="Enter the reading passage here..."
         value={passage}
@@ -90,12 +87,12 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
       />
 
       <div className="mt-6">
-        <h4 className="font-semibold text-lg mb-4 text-white">Multiple Choice Questions</h4>
+        <h4 className="font-semibold text-lg mb-4 text-gray-800">Multiple Choice Questions</h4>
         {mcqs.map((mcq, index) => (
-          <div key={index} className="bg-slate-900/70 p-4 rounded-md mb-4 border border-slate-700">
+          <div key={index} className="bg-gray-50 p-4 rounded-md mb-4 border border-gray-200">
             <input
               type="text"
-              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-md mb-3 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full p-2 bg-white border border-gray-300 rounded-md mb-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder={`Question ${index + 1}`}
               value={mcq.questionText}
               onChange={(e) => handleMcqChange(index, 'questionText', e.target.value)}
@@ -105,7 +102,7 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
                 <input
                   key={optIndex}
                   type="text"
-                  className="w-full p-2 bg-slate-800 border border-slate-600 rounded-md text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder={`Option ${optIndex + 1}${optIndex === 0 ? ' (Correct Answer)' : ''}`}
                   value={option}
                   onChange={(e) => handleOptionChange(index, optIndex, e.target.value)}
@@ -119,8 +116,8 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
         </button>
       </div>
 
-      <div className="flex justify-end gap-4 mt-8 border-t border-slate-700 pt-4">
-        <button onClick={onCancel} className="bg-slate-600 text-white py-2 px-5 rounded-md hover:bg-slate-700">Cancel</button>
+      <div className="flex justify-end gap-4 mt-8 border-t border-gray-200 pt-4">
+        <button onClick={onCancel} className="bg-gray-200 text-gray-800 py-2 px-5 rounded-md hover:bg-gray-300">Cancel</button>
         <button onClick={handleSave} className="bg-green-600 text-white py-2 px-5 rounded-md hover:bg-green-700">Save Question</button>
       </div>
     </div>

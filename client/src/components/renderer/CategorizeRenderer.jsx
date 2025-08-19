@@ -7,7 +7,7 @@ function DraggableItem({ id, children }) {
   const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 100 } : undefined;
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="bg-slate-700 p-3 rounded-md shadow border border-slate-600 cursor-grab text-white">
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="bg-white p-3 rounded-md shadow border border-gray-300 cursor-grab text-gray-800">
       {children}
     </div>
   );
@@ -16,13 +16,12 @@ function DraggableItem({ id, children }) {
 function DroppableCategory({ id, children, title }) {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className="bg-slate-900/50 p-4 rounded-lg border-2 border-dashed border-slate-700 min-h-[150px]">
-      <h4 className="font-bold mb-4 text-center text-slate-300">{title}</h4>
+    <div ref={setNodeRef} className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300 min-h-[150px]">
+      <h4 className="font-bold mb-4 text-center text-gray-600">{title}</h4>
       <div className="space-y-3">{children}</div>
     </div>
   );
 }
-
 
 const CategorizeRenderer = ({ question, onAnswerChange }) => {
   const [itemLists, setItemLists] = useState({
@@ -52,11 +51,11 @@ const CategorizeRenderer = ({ question, onAnswerChange }) => {
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="bg-slate-800/50 p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
         {question.image && <img src={question.image} alt="Question visual" className="w-full h-48 object-cover rounded-md mb-6" />}
-        <h3 className="text-2xl font-bold mb-4 text-white">Categorize These Items</h3>
+        <h3 className="text-2xl font-bold mb-4 text-gray-900">Categorize These Items</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DroppableCategory id="unassigned" title="Items">
+          <DroppableCategory id="unassigned" title="Items to Sort">
             {itemLists.unassigned.map(item => <DraggableItem key={item} id={item}>{item}</DraggableItem>)}
           </DroppableCategory>
           <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">

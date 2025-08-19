@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 
 const SignInPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A0F1F] p-4">
+    // Updated background color
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -12,10 +13,11 @@ const SignInPage = () => {
       >
         <SignIn 
           afterSignInUrl="/dashboard" 
+          // Updated card styles for a light theme
           appearance={{
             elements: {
-              rootBox: "glass-card p-8",
-              card: "bg-transparent shadow-none",
+              rootBox: "shadow-xl",
+              card: "bg-white",
             }
           }}
         />
