@@ -1,5 +1,5 @@
-// src/components/builder/ComprehensionBuilder.jsx
 import { useState, useRef } from 'react';
+import axios from 'axios'; 
 
 const ComprehensionBuilder = ({ onSave, onCancel }) => {
   const [passage, setPassage] = useState('');
@@ -34,11 +34,27 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
       alert('Please fill in the passage and all question texts.');
       return;
     }
-    
+
     let imageUrl = '';
+
     if (imageFile) {
-        console.log("Uploading image:", imageFile.name);
-        imageUrl = imagePreview; 
+        try {
+            const authResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/imagekit/auth`);
+            const formData = new FormData();
+            formData.append('file', imageFile);
+            formData.append('fileName', imageFile.name);
+            formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+            formData.append('signature', authResponse.data.signature);
+            formData.append('expire', authResponse.data.expire);
+            formData.append('token', authResponse.data.token);
+
+            const uploadResponse = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formData);
+            imageUrl = uploadResponse.data.url;
+        } catch (err) {
+            alert('Failed to upload question image. Please try again.');
+            console.error(err);
+            return; 
+        }
     }
 
     const questionData = {
@@ -51,6 +67,7 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
   };
 
   return (
+
     <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-md mt-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-900">Create Comprehension Question</h3>
@@ -76,7 +93,7 @@ const ComprehensionBuilder = ({ onSave, onCancel }) => {
           </button>
         </div>
       )}
-      
+
       <label className="block text-gray-700 font-semibold mb-2">Passage</label>
       <textarea
         className="w-full p-3 bg-gray-50 border border-gray-300 rounded-md text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"

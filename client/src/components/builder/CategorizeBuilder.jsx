@@ -1,5 +1,5 @@
-// src/components/builder/CategorizeBuilder.jsx
 import { useState, useRef } from 'react';
+import axios from 'axios'; 
 
 const CategorizeBuilder = ({ onSave, onCancel }) => {
   const [categories, setCategories] = useState(['Category 1', 'Category 2']);
@@ -15,7 +15,7 @@ const CategorizeBuilder = ({ onSave, onCancel }) => {
   };
 
   const addCategory = () => setCategories([...categories, `Category ${categories.length + 1}`]);
-  
+
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
@@ -31,21 +31,39 @@ const CategorizeBuilder = ({ onSave, onCancel }) => {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (categories.some(c => !c.trim()) || items.some(i => !i.text.trim())) {
       alert('Please fill out all category and item fields.');
       return;
     }
-    
+
     let imageUrl = '';
+
     if (imageFile) {
-        imageUrl = imagePreview; // Placeholder for actual ImageKit URL
+        try {
+            const authResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/imagekit/auth`);
+            const formData = new FormData();
+            formData.append('file', imageFile);
+            formData.append('fileName', imageFile.name);
+            formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+            formData.append('signature', authResponse.data.signature);
+            formData.append('expire', authResponse.data.expire);
+            formData.append('token', authResponse.data.token);
+
+            const uploadResponse = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formData);
+            imageUrl = uploadResponse.data.url;
+        } catch (err) {
+            alert('Failed to upload question image. Please try again.');
+            console.error(err);
+            return; 
+        }
     }
 
     onSave({ type: 'Categorize', categories, items, image: imageUrl });
   };
 
   return (
+
     <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-md mt-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-900">Create Categorize Question</h3>
@@ -58,7 +76,7 @@ const CategorizeBuilder = ({ onSave, onCancel }) => {
           </>
         )}
       </div>
-      
+
       {imagePreview && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-4">
           <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover rounded-md"/>

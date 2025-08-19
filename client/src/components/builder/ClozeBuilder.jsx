@@ -1,6 +1,5 @@
-// src/components/builder/ClozeBuilder.jsx
 import { useState, useRef } from 'react';
-
+import axios from 'axios';
 const ClozeBuilder = ({ onSave, onCancel }) => {
   const [options, setOptions] = useState([]);
   const [imageFile, setImageFile] = useState(null);
@@ -17,19 +16,19 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
       alert('Please select a word or phrase from the passage to make it a blank.');
       return;
     }
-    
+
     if (options.includes(selectedText)) {
       alert('This word has already been added as an option.');
       return;
     }
 
     setOptions(prevOptions => [...prevOptions, selectedText]);
-    
+
     const range = selection.getRangeAt(0);
     range.deleteContents();
     range.insertNode(document.createTextNode('[BLANK]'));
   };
-  
+
   const handleQuestionImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -37,7 +36,7 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const finalPassage = passageRef.current.innerText;
     if (!finalPassage.includes('[BLANK]') || options.length === 0) {
       alert('Please create at least one blank in the passage.');
@@ -45,8 +44,25 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
     }
 
     let imageUrl = '';
+
     if (imageFile) {
-        imageUrl = imagePreview; // Placeholder for actual ImageKit URL
+        try {
+            const authResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/imagekit/auth`);
+            const formData = new FormData();
+            formData.append('file', imageFile);
+            formData.append('fileName', imageFile.name);
+            formData.append('publicKey', import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+            formData.append('signature', authResponse.data.signature);
+            formData.append('expire', authResponse.data.expire);
+            formData.append('token', authResponse.data.token);
+
+            const uploadResponse = await axios.post('https://upload.imagekit.io/api/v1/files/upload', formData);
+            imageUrl = uploadResponse.data.url;
+        } catch (err) {
+            alert('Failed to upload question image. Please try again.');
+            console.error(err);
+            return; 
+        }
     }
 
     onSave({ type: 'Cloze', passage: finalPassage, options, image: imageUrl });
