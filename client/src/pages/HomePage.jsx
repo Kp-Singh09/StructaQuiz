@@ -3,7 +3,9 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-// A simplified, professional feature list
+import { useUser } from "@clerk/clerk-react"; 
+
+
 const features = [
   {
     icon: "📝",
@@ -46,7 +48,7 @@ const faqData = [
 
 export default function HomePage() {
   const [openIndex, setOpenIndex] = useState(null);
-
+  const { isSignedIn } = useUser();
   const toggleFAQ = (idx) => setOpenIndex(openIndex === idx ? null : idx);
 
   return (
@@ -78,7 +80,7 @@ export default function HomePage() {
             <p className="mt-6 text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
               Go beyond simple multiple-choice. With StructaQuiz, you can create dynamic assessments with unique question formats that challenge users and provide deeper insights.
             </p>
-            <Link to="/dashboard">
+            <Link to={isSignedIn ? "/dashboard" : "/sign-in"}>
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 0 24px #60a5fa" }}
                   whileTap={{ scale: 0.98 }}

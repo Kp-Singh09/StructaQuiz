@@ -1,3 +1,4 @@
+// server/models/Response.js
 import mongoose from 'mongoose';
 
 const responseSchema = new mongoose.Schema({
@@ -10,7 +11,8 @@ const responseSchema = new mongoose.Schema({
   
   answers: [{
     questionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Question', required: true },
-    answer: { type: mongoose.Schema.Types.Mixed, required: true }
+    answer: { type: mongoose.Schema.Types.Mixed, required: true },
+    points: { type: Number, default: 0 } // 👈 Add this field
   }],
   submittedAt: { type: Date, default: Date.now }
 });

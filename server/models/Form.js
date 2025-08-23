@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 const formSchema = new mongoose.Schema({
   // --- ADD THIS LINE ---
   userId: { type: String, required: true },
-  
+  username: { type: String, default: 'Anonymous' },
   title: { type: String, default: 'Untitled Form' },
   headerImage: { type: String, default: null }, 
   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Question' }],

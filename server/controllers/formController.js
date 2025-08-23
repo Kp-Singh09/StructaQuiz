@@ -70,13 +70,14 @@ export const updateForm = async (req, res) => {
 // @access  Private
 export const createForm = async (req, res) => {
   try {
-    const { title, userId } = req.body;
+    const { title, userId, username } = req.body; 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required to create a form.' });
     }
     const form = new Form({
       title: title || 'My New Form',
       userId: userId,
+      username: username || 'Anonymous'
     });
     const newForm = await form.save();
     res.status(201).json(newForm);

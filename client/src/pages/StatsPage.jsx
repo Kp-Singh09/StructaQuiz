@@ -64,7 +64,7 @@ const StatsPage = () => {
                             }`}>
                                 <div className="flex items-center gap-4">
                                     <span className="text-2xl font-bold w-8 text-center">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</span>
-                                    <p className="font-semibold text-gray-800 truncate">{entry.userId === user.id ? "You" : `User ID: ...${entry.userId.slice(-6)}`}</p>
+                                    <p className="font-semibold text-gray-800 truncate">{entry.userId === user.id ? "You" : entry.username || `User ID: ...${entry.userId.slice(-6)}`}</p>
                                 </div>
                                 <p className="font-bold text-xl text-blue-600">{entry.score} pts</p>
                             </li>

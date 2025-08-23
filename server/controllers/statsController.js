@@ -44,6 +44,7 @@ export const getLeaderboard = async (req, res) => {
             {
                 $group: {
                     _id: "$formInfo.userId",
+                    username: { $first: "$formInfo.username" },
                     responseCount: { $sum: 1 },
                 }
             },
@@ -61,6 +62,7 @@ export const getLeaderboard = async (req, res) => {
             {
                 $project: {
                     userId: "$_id",
+                    username: "$username",
                     score: { $add: [ { $multiply: [{ $size: "$userForms" }, 10] }, { $multiply: ["$responseCount", 2] } ] },
                     _id: 0
                 }

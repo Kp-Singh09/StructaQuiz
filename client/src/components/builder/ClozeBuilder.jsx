@@ -1,5 +1,7 @@
+// src/components/builder/ClozeBuilder.jsx
 import { useState, useRef } from 'react';
 import axios from 'axios';
+
 const ClozeBuilder = ({ onSave, onCancel }) => {
   const [options, setOptions] = useState([]);
   const [imageFile, setImageFile] = useState(null);
@@ -7,28 +9,44 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
   const passageRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // 👇 This is the fully corrected logic
   const handleMakeBlank = () => {
     const selection = window.getSelection();
-    if (!selection.rangeCount) return;
-    const selectedText = selection.toString().trim();
-
-    if (!selectedText) {
-      alert('Please select a word or phrase from the passage to make it a blank.');
-      return;
+    if (!selection.rangeCount || selection.isCollapsed) {
+        alert('Please select a word or phrase from the passage to make it a blank.');
+        return;
     }
+
+    const selectedText = selection.toString().trim();
+    if (!selectedText) return;
 
     if (options.includes(selectedText)) {
-      alert('This word has already been added as an option.');
-      return;
+        alert('This word has already been added as an option.');
+        return;
     }
 
-    setOptions(prevOptions => [...prevOptions, selectedText]);
-
     const range = selection.getRangeAt(0);
-    range.deleteContents();
-    range.insertNode(document.createTextNode('[BLANK]'));
-  };
+    const preSelectionRange = document.createRange();
+    preSelectionRange.selectNodeContents(passageRef.current);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    
+    const preSelectionText = preSelectionRange.toString();
+    const blankIndex = (preSelectionText.match(/\[BLANK\]/g) || []).length;
 
+    range.deleteContents();
+    const blankNode = document.createTextNode('[BLANK]');
+    range.insertNode(blankNode);
+
+    setOptions(prevOptions => {
+        const newOptions = [...prevOptions];
+        newOptions.splice(blankIndex, 0, selectedText);
+        return newOptions;
+    });
+
+    // Reset selection to avoid issues
+    selection.removeAllRanges();
+  };
+  
   const handleQuestionImageUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -44,7 +62,6 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
     }
 
     let imageUrl = '';
-
     if (imageFile) {
         try {
             const authResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/imagekit/auth`);
@@ -61,7 +78,7 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
         } catch (err) {
             alert('Failed to upload question image. Please try again.');
             console.error(err);
-            return; 
+            return;
         }
     }
 
@@ -69,6 +86,7 @@ const ClozeBuilder = ({ onSave, onCancel }) => {
   };
 
   return (
+    // ... (The JSX remains the same) ...
     <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-md mt-6 animate-fadeIn">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-xl font-bold text-gray-900">Create Cloze (Fill-in-the-Blanks) Question</h3>

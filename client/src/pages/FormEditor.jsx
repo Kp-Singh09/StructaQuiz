@@ -57,7 +57,8 @@ const FormEditor = () => {
                 if (!user) throw new Error("User not found");
                 const formResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
                     title: currentTitle,
-                    userId: user.id
+                    userId: user.id,
+                    username: user.fullName || user.username
                 });
                 navigate(`/editor/${formResponse.data._id}`, { replace: true });
             } else {
@@ -82,7 +83,8 @@ const FormEditor = () => {
                 if (!user) throw new Error("User not found");
                 const formResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/forms`, {
                     title: currentTitle,
-                    userId: user.id
+                    userId: user.id,
+                    username: user.fullName || user.username 
                 });
                 currentFormId = formResponse.data._id;
                 navigate(`/editor/${currentFormId}`, { replace: true });
